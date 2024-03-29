@@ -5,12 +5,10 @@ class OrdersController < ApplicationController
 
   def index
     gon.public_key = ENV['PAYJP_PUBLIC_KEY']
-    @item = Item.find(params[:item_id])
     @order_destination = OrderDestination.new
   end
 
   def create
-    @item = Item.find(params[:item_id])
     @order_destination = OrderDestination.new(order_params)
     if @order_destination.valid?
       pay_item
@@ -41,10 +39,9 @@ class OrdersController < ApplicationController
   end
 
   def pay_item
-    item = Item.find(order_params[:item_id])
     Payjp.api_key = ENV['PAYJP_SECRET_KEY'] # PAY.JPテスト秘密鍵
     Payjp::Charge.create(
-      amount: item.price,
+      amount: @item.price,
       card: order_params[:token],
       currency: 'jpy'
     )
